@@ -1,0 +1,11 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: webserver
+          uri: ${webserver.url}
+          predicates:
+            - Path=/**
+            - Method=GET
+          filters:
+            - SecureHeaders
