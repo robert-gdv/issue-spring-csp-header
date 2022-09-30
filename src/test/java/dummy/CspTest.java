@@ -6,6 +6,7 @@ import org.mockserver.model.MediaType;
 import org.mockserver.springtest.MockServerTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.gateway.filter.factory.SecureHeadersGatewayFilterFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -23,23 +24,22 @@ class CspTest {
     protected WebTestClient client;
 
     @Test
-    void contentType() {
-        webserverMock.when(request("/").withMethod("GET"))
+    void securedRoute() {
+        webserverMock.when(request().withMethod("GET"))
                      .respond(response("<html/>").withContentType(MediaType.HTML_UTF_8));
-        client.method(HttpMethod.GET).uri("/")
+        client.method(HttpMethod.GET).uri("/secure/")
               .exchange()
               .expectStatus().isOk()
               .expectHeader().doesNotExist("content-security-policy");
     }
 
     @Test
-    void setupWorks() {
-        webserverMock.when(request("/").withMethod("GET"))
+    void insecureRoute() {
+        webserverMock.when(request().withMethod("GET"))
                 .respond(response("<html/>").withContentType(MediaType.HTML_UTF_8));
-        client.method(HttpMethod.GET).uri("/")
+        client.method(HttpMethod.GET).uri("/insecure/")
                 .exchange()
                 .expectStatus().isOk()
-                .expectHeader().contentType("text/html; charset=utf-8")
-                .expectBody(String.class).isEqualTo("<html/>");
+                .expectHeader().doesNotExist("content-security-policy");
     }
 }

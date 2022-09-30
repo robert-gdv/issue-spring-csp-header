@@ -2,10 +2,15 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: webserver
+        - id: securedRoute
           uri: ${webserver.url}
           predicates:
-            - Path=/**
+            - Path=/secure/**
             - Method=GET
           filters:
             - SecureHeaders
+        - id: insecureRoute
+          uri: ${webserver.url}
+          predicates:
+            - Path=/insecure/**
+            - Method=GET
